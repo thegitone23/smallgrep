@@ -52,13 +52,34 @@ pub struct Config {
 impl Config {
 	pub fn build(args: &[String]) -> Result<Config, &'static str> {
 
-		if args.len() < 3 {
-			return Err("expected <query_string> <filepath> as arguments");
-		}
+		let mut query = "".to_string();
+		let mut file_path = "".to_string();
+    let mut ignore_case = env::var("IGNORE_CASE").is_ok();
 
-		let query = args[1].clone();
-		let file_path = args[2].clone();
-    let ignore_case = env::var("IGNORE_CASE").is_ok();
+    for (index, arg ) in args.iter().enumerate() {
+      if index == 0 { // first element is the program name
+        continue;
+      }
+
+      if arg.starts_with("-") {
+        // handling flags
+        if arg == "-i" {
+          ignore_case = true;
+        }
+      } else {
+        // handling positional parameters
+        if query == "" {
+          query = arg.clone();
+        }
+        else if query != "" && file_path == "" {
+          file_path = arg.clone();
+        }
+      }
+    }
+
+		if query == "" || file_path == "" {
+			return Err("expected <query_string> <filepath> as arguments (flag -i for case insensitive)");
+		}
 
 		return Ok(Config{query, file_path, ignore_case});
 	}		
