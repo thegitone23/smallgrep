@@ -9,7 +9,7 @@ fn main() {
 		println!("Problem parsing areguments : {err}");
 		process::exit(1);
 	});
-	println!("Will search for {0} in {1}", config.query, config.file_path);
+
 	if let Err(e) = smallgrep::run(config) {
 		println!("Application error : {e}");
 		process::exit(1);
